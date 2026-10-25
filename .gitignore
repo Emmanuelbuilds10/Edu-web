@@ -29,6 +29,14 @@ yarn-error.log*
 .env*.local
 .env
 
+# local development data (MongoDB files and uploaded media)
+/.data
+/public/uploads
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
 # vercel
 .vercel
 

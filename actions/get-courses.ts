@@ -27,9 +27,6 @@ export const getCourses = async ({
         const courses = await db.course.findMany({
             where: {
                 isPublished: true,
-                title: {
-                    contains: title
-                },
                 categoryId: categoryIds?.length
                     ? { in: categoryIds }
                     : categoryId ? { equals: categoryId } : undefined,
@@ -54,8 +51,16 @@ export const getCourses = async ({
             }
         })
 
+        // Match titles here instead of in the database so search is
+        // case-insensitive on every supported database (MongoDB `contains`
+        // is case-sensitive and has no `mode: "insensitive"`).
+        const normalizedTitle = title?.trim().toLocaleLowerCase()
+        const matchingCourses = normalizedTitle
+            ? courses.filter(course => course.title.toLocaleLowerCase().includes(normalizedTitle))
+            : courses
+
         const courseWithProgress: CourseWithProgressWithCategory[] = await Promise.all(
-            courses.map(async course => {
+            matchingCourses.map(async course => {
                 if (!userId || course.purchases.length === 0) {
                     return {
                         ...course,

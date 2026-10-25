@@ -14,14 +14,11 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { AlignLeft, Check, Loader2, SquarePen } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
-import { Chapter, Course } from "@prisma/client";
+import { Chapter } from "@prisma/client";
 import { Editor } from "@/components/editor";
 import { Preview } from "@/components/preview";
 
@@ -68,36 +65,46 @@ export const ChapterDescriptionForm = ({
       toast.error("Something went wrong");
     }
   };
+
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
-      <div className="font-medium flex items-center justify-between">
-        Chapter Description
-        <Button onClick={toggleEdit} variant="ghost">
+    <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-teal-300/60">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500">
+            <AlignLeft className="h-4 w-4" />
+          </span>
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">
+            What this chapter teaches
+          </p>
+        </div>
+        <Button
+          type="button"
+          onClick={toggleEdit}
+          variant="outline"
+          size="sm"
+          className="shrink-0 gap-1.5 rounded-lg border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-teal-300 hover:text-teal-700"
+        >
           {isEditing ? (
-            <>Cancel</>
+            "Cancel"
           ) : (
             <>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit Description
+              <SquarePen className="h-3.5 w-3.5" />
+              Edit
             </>
           )}
         </Button>
       </div>
+
       {!isEditing && (
-        <div
-          className={cn(
-            "text-sm mt-2",
-            !initialData.description && "text-slate-500 italic"
-          )}
-        >
-          {!initialData.description &&  "No description"}
-          {initialData.description && (
-            <Preview 
-              value={initialData.description}
-            />
+        <div className="mt-3 text-sm leading-6 text-slate-700">
+          {!initialData.description ? (
+            <span className="italic text-slate-400">No description yet</span>
+          ) : (
+            <Preview value={initialData.description} />
           )}
         </div>
       )}
+
       {isEditing && (
         <Form {...form}>
           <form
@@ -116,8 +123,17 @@ export const ChapterDescriptionForm = ({
                 </FormItem>
               )}
             />
-            <div className="items-center flex gap-x-2">
-              <Button disabled={!isValid || isSubmitting} type="submit">
+            <div className="flex items-center justify-end gap-2">
+              <Button
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                className="gap-2 rounded-xl bg-teal-600 text-white shadow-none hover:bg-teal-700"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
                 Save
               </Button>
             </div>

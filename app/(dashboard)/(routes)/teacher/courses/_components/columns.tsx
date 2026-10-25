@@ -18,6 +18,8 @@ export const columns: ColumnDef<Course>[] = [
         return (
             <Button
                 variant="ghost"
+                size="sm"
+                className="-ml-3 text-xs font-semibold uppercase tracking-wide text-slate-500 hover:text-slate-900"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Title
@@ -32,6 +34,8 @@ export const columns: ColumnDef<Course>[] = [
         return (
             <Button
                 variant="ghost"
+                size="sm"
+                className="-ml-3 text-xs font-semibold uppercase tracking-wide text-slate-500 hover:text-slate-900"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Price
@@ -40,14 +44,20 @@ export const columns: ColumnDef<Course>[] = [
         )
     },
     cell: ({row}) => {
-        const price = parseFloat(row.getValue("price") || "0")
+        const price = row.getValue("price") as number | null
+        if (price === null || price === undefined) {
+            return <span className="text-slate-400">Not set</span>
+        }
+        if (price === 0) {
+            return <span className="font-medium text-emerald-700">Free</span>
+        }
         const formatted = new Intl.NumberFormat("en-us", {
             style: "currency",
             currency: "NGN",
             currencyDisplay: "narrowSymbol"
         }).format(price)
 
-        return <div>{formatted}</div>
+        return <div className="font-medium text-slate-700">{formatted}</div>
     }
   },
   {
@@ -56,6 +66,8 @@ export const columns: ColumnDef<Course>[] = [
         return (
             <Button
                 variant="ghost"
+                size="sm"
+                className="-ml-3 text-xs font-semibold uppercase tracking-wide text-slate-500 hover:text-slate-900"
                 onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
             >
                 Published
@@ -68,8 +80,8 @@ export const columns: ColumnDef<Course>[] = [
 
         return (
             <Badge className={cn(
-                "bg-slate-500",
-                isPublished && "bg-neutral-700"
+                "border border-slate-200 bg-slate-100 font-semibold text-slate-600 hover:bg-slate-100",
+                isPublished && "border-emerald-100 bg-emerald-50 text-emerald-700 hover:bg-emerald-50"
             )}>
                 {isPublished ? "Published" : "Draft"}
             </Badge>
@@ -91,9 +103,9 @@ export const columns: ColumnDef<Course>[] = [
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <Link href={`/teacher/courses/${id}`}>
-                        <DropdownMenuItem>
-                            <Pencil className="h-4 w-4 mr-2" />
-                            Edit
+                        <DropdownMenuItem className="cursor-pointer">
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit course
                         </DropdownMenuItem>
                     </Link>
                 </DropdownMenuContent>

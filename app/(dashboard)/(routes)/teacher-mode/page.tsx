@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { hasTeacherAccess, isTeacherAdmin } from "@/lib/teacher";
 import { redirect } from "next/navigation";
@@ -13,12 +13,14 @@ export default async function TeacherModePage() {
   ]);
 
   return (
-    <div className="page-shell min-h-full p-5 md:p-8">
-      <div className="mx-auto max-w-5xl">
-        <p className="eyebrow">Teach on Sabiplex</p>
-        <h1 className="mt-1 text-3xl font-black tracking-tight">Choose your teaching mode</h1>
-        <p className="mt-2 text-slate-600">Teach a course, or keep learning from your library.</p>
-        <div className="mt-7">
+    <div className="dashboard-canvas min-h-full p-5 md:p-8">
+      <div className="w-full space-y-6">
+        <div>
+          <p className="eyebrow text-teal-700">Teach on Sabiplex</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Choose your teaching mode</h1>
+          <p className="mt-1.5 text-sm text-slate-500">Teach a course, or keep learning from your library.</p>
+        </div>
+        <div>
           <TeacherModePanel isTeacher={hasAccess} isAdmin={isTeacherAdmin(userId)} applicationStatus={application?.status ?? null} />
         </div>
       </div>

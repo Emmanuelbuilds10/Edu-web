@@ -1,6 +1,6 @@
 import { getProgress } from "@/actions/get-progress"
 import { db } from "@/lib/db"
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import { CourseSidebar } from "./_components/course-sidebar"
 import { CourseNavbar } from "./_components/course-navbar"
@@ -45,20 +45,20 @@ const CourseLayout = async ({
     const progressCount = userId ? await getProgress(userId, course.id) : 0
 
     return (
-        <div className="min-h-full bg-slate-50">
-            <div className="h-[76px] md:pl-80 fixed inset-y-0 w-full z-50">
+        <div className="min-h-screen bg-slate-50">
+            <header className="fixed inset-x-0 top-0 z-40 h-[76px] md:left-80 print:hidden">
                 <CourseNavbar
                     course={course}
                     progressCount={progressCount}
                 />
-            </div>
-            <div className="hidden md:flex h-full w-80 flex-col fixed inset-y-0 z-50">
+            </header>
+            <aside className="fixed inset-y-0 left-0 z-50 hidden w-80 md:block print:hidden">
                 <CourseSidebar
                     course={course}
                     progressCount={progressCount}
                 />
-            </div>
-            <main className="md:pl-80 pt-[76px] min-h-full">
+            </aside>
+            <main className="min-h-screen pt-[76px] md:pl-80 print:pl-0 print:pt-0">
 
             {children}
             </main>

@@ -1,4 +1,3 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatPrice } from '@/lib/format';
 
 interface DataCardProps {
@@ -9,15 +8,11 @@ interface DataCardProps {
 
 export const DataCard = ({ value, label, shouldFormat }: DataCardProps) => {
   return (
-    <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium">{label}</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold">
-          {shouldFormat ? formatPrice(value) : value}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-5">
+      <p className="text-xs font-medium text-slate-500">{label}</p>
+      <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900">
+        {shouldFormat ? formatPrice(value) : value}
+      </p>
+    </div>
   );
 };

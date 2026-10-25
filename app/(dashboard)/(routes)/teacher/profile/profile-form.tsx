@@ -34,7 +34,7 @@ export function ProfileForm({ initialValues }: { initialValues: ProfileValues })
   };
 
   return (
-    <form onSubmit={save} className="space-y-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <form onSubmit={save} className="surface-card space-y-5 p-6 sm:p-8">
       <div><label htmlFor="headline" className="mb-2 block text-sm font-semibold">Professional headline</label><Input id="headline" value={values.headline} onChange={(event) => update("headline", event.target.value)} maxLength={120} placeholder="e.g. Product designer and educator" /></div>
       <div><label htmlFor="bio" className="mb-2 block text-sm font-semibold">About you</label><Textarea id="bio" value={values.bio} onChange={(event) => update("bio", event.target.value)} maxLength={2000} rows={7} placeholder="Share your experience, teaching approach, and what students can expect." /><p className="mt-1 text-right text-xs text-slate-400">{values.bio.length}/2000</p></div>
       <div><label htmlFor="expertise" className="mb-2 block text-sm font-semibold">Areas of expertise</label><Input id="expertise" value={values.expertise} onChange={(event) => update("expertise", event.target.value)} placeholder="Design, Product strategy, Figma" /><p className="mt-1 text-xs text-slate-500">Separate up to 8 topics with commas.</p></div>

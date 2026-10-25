@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { notifyTeacherFollowers } from "@/lib/notifications";
 
@@ -41,7 +41,7 @@ export async function PATCH(
             !course.imageUrl ||
             !course.categoryId
           ) {
-            return new NextResponse("Missing Required Fields", { status: 401 });
+            return new NextResponse("Missing Required Fields", { status: 400 });
           }
 
           const wasPublished = course.isPublished;

@@ -1,6 +1,6 @@
 "use client"
 
-import { Archive, Award, BarChart, Compass, GraduationCap, Layout, List, MessageCircle, UserRound } from "lucide-react"
+import { Archive, Award, BarChart, Compass, Layout, List, MessageCircle, ShieldCheck, UserRound, Users } from "lucide-react"
 import { SidebarItem } from "./sidebar-item"
 import { usePathname } from "next/navigation"
 
@@ -26,16 +26,6 @@ const guestroutes = [
         href: '/forum',
     },
     {
-        icon: UserRound,
-        label: "My profile",
-        href: '/profile',
-    },
-    {
-        icon: GraduationCap,
-        label: "Teach on Sabiplex",
-        href: '/teacher-mode',
-    },
-    {
         icon: Award,
         label: "Achievements",
         href: '/achievements',
@@ -43,14 +33,14 @@ const guestroutes = [
 ]
 const teacherRoutes = [
     {
-        icon: Layout,
-        label: "Learner mode",
-        href: '/dashboard',
-    },
-    {
         icon: List,
         label: "Courses",
         href: '/teacher/courses',
+    },
+    {
+        icon: Users,
+        label: "Students",
+        href: '/teacher/students',
     },
     {
         icon: UserRound,
@@ -64,11 +54,15 @@ const teacherRoutes = [
     },
 ]
 
-export const SidebarRoutes = () => {
+export const SidebarRoutes = ({ isAdmin = false }: { isAdmin?: boolean }) => {
     const pathname = usePathname()
 
     const isTeacherPage = pathname?.startsWith("/teacher/")
-    const routes = isTeacherPage ? teacherRoutes : guestroutes
+    const routes = isTeacherPage
+        ? isAdmin
+            ? [...teacherRoutes, { icon: ShieldCheck, label: "Accounts", href: '/teacher/users' }]
+            : teacherRoutes
+        : guestroutes
     return(
         <div className="flex w-full flex-col gap-1.5">
             {routes.map((route) => (

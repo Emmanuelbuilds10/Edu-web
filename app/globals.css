@@ -1,3 +1,7 @@
+/* Loaded first so its precompiled `.hidden` utility cannot override the app's
+   responsive classes such as `md:block` on the dashboard sidebar. */
+@import "@uploadthing/react/styles.css";
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -76,7 +80,88 @@ body,
 
 ::selection { @apply bg-neutral-300 text-neutral-950; }
 
+/* Route progress bar */
+#nprogress { pointer-events: none; }
+#nprogress .bar {
+  background: linear-gradient(90deg, #0f172a, #334155, #14b8a6);
+  height: 3px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+}
+#nprogress .peg { box-shadow: 0 0 10px #0f172a, 0 0 5px #0f172a; }
+
+/* Scroll reveal */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal[data-visible="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Loading skeleton */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.9rem;
+  background-color: rgb(226 232 240 / 0.75);
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.65), transparent);
+  animation: shimmer 1.6s infinite;
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Never hide content when JavaScript is unavailable. */
+@media (scripting: none) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .animate-float-slow,
+  .animate-float-slower,
+  .animate-gradient-pan,
+  .animate-soft-pulse,
+  .skeleton::after {
+    animation: none;
+  }
+}
+
 .page-shell { @apply min-h-full bg-[radial-gradient(circle_at_top_right,_rgba(203,213,225,.45),_transparent_31%),linear-gradient(180deg,#f8fafc_0%,#f1f5f9_100%)]; }
+
+/* Dashboard overview canvas: soft mint/blue wash like the reference design. */
+.dashboard-canvas {
+  background:
+    radial-gradient(1100px 520px at 88% -10%, rgba(153, 246, 228, 0.38), transparent 62%),
+    radial-gradient(900px 480px at 0% 0%, rgba(191, 219, 254, 0.34), transparent 58%),
+    linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.surface-card { @apply rounded-2xl border border-white/80 bg-white/90 shadow-[0_12px_36px_rgba(15,23,42,.05)] backdrop-blur-xl; }
 .glass { @apply border border-white/70 bg-white/75 shadow-[0_12px_40px_rgba(15,23,42,.06)] backdrop-blur-xl; }
 .eyebrow { @apply text-xs font-bold uppercase tracking-[0.18em] text-neutral-700; }
 
@@ -84,4 +169,3 @@ body,
   font-size: 16px !important;
 }
 
-@import "~@uploadthing/react/styles.css"

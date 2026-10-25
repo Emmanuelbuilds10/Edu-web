@@ -28,13 +28,15 @@ export const getChapter = async ({
                 id: courseId
             },
             select: {
-                price: true
+                price: true,
+                userId: true
             }
         })
 
         const chapter  = await db.chapter.findUnique({
             where: {
                 id: chapterId,
+                courseId,
                 isPublished: true
             }
         })

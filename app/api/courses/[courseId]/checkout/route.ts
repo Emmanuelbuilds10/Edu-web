@@ -1,4 +1,4 @@
-import { currentUser } from '@clerk/nextjs/server';
+import { currentUser, isDemoAuth } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import axios from 'axios';
@@ -44,7 +44,23 @@ export async function POST(
 
     const paystackSecretKey = process.env.PAYSTACK_SECRET_KEY;
     if (!paystackSecretKey) {
-      return new NextResponse('Paystack is not configured on the server.', { status: 500 });
+      // Local demo mode: no payment provider is configured, so record the
+      // enrolment directly and send the student back to the course. Real
+      // deployments (Clerk configured) still require Paystack.
+      if (!isDemoAuth) {
+        return new NextResponse('Paystack is not configured on the server.', { status: 500 });
+      }
+      await db.purchase.upsert({
+        where: { userId_courseId: { userId: user.id, courseId: course.id } },
+        update: { amountPaidKobo: Math.round(course.price * 100), currency: 'NGN' },
+        create: {
+          userId: user.id,
+          courseId: course.id,
+          amountPaidKobo: Math.round(course.price * 100),
+          currency: 'NGN',
+        },
+      });
+      return NextResponse.json({ url: `/courses/${course.id}?demo_payment=1`, demo: true });
     }
 
     const appUrl = process.env.NEXT_PUBLIC_APP_URL;

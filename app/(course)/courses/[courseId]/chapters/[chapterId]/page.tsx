@@ -1,9 +1,10 @@
 import { getChapter } from "@/actions/get-chapter";
 import { Banner } from "@/components/banner";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { VideoPlayer } from "./_components/video-player";
 import { CourseEnrollButton } from "./_components/course-enroll-button";
+import { CourseFreeEnrollButton } from "./_components/course-free-enroll-button";
 import { Separator } from "@/components/ui/separator";
 import { Preview } from "@/components/preview";
 import { File } from "lucide-react";
@@ -39,7 +40,9 @@ const ChapterIdPage = async ({
         return redirect('/')
     }
 
-    const isLocked = !chapter.isFree && !purchase
+    const isOwner = course.userId === userId
+    const isLocked = !chapter.isFree && !purchase && !isOwner
+    const isFreeCourse = course.price === 0
 
     const completeOnEnd = !!purchase && !userProgress?.isCompleted
     const storedActivities = await db.chapter.findUnique({
@@ -112,11 +115,17 @@ const ChapterIdPage = async ({
                         chapterId={chapter.id}
                         courseId={params.courseId}
                       />
-                    ): userId ? (
-                        <CourseEnrollButton 
-                            courseId={params.courseId}
-                            price={course.price!}
-                        />
+                    ) : isOwner ? (
+                        <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold text-neutral-700">Instructor preview</span>
+                    ) : userId ? (
+                        isFreeCourse ? (
+                            <CourseFreeEnrollButton courseId={params.courseId} />
+                        ) : typeof course.price === "number" && course.price > 0 ? (
+                            <CourseEnrollButton 
+                                courseId={params.courseId}
+                                price={course.price}
+                            />
+                        ) : null
                     ) : (
                         <Button asChild className="w-full md:w-auto">
                             <Link href={`/sign-in?redirect_url=${encodeURIComponent(`/courses/${params.courseId}`)}`}>

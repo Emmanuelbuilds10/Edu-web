@@ -1,11 +1,10 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LucideIcon } from "lucide-react";
-import { usePathname, useRouter } from "next/navigation";
-import { useState, useTransition, useEffect } from "react";
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
+
+import { cn } from "@/lib/utils";
 
 interface SidebarItemProps {
   icon: LucideIcon;
@@ -15,46 +14,19 @@ interface SidebarItemProps {
 
 export const SidebarItem = ({ icon: Icon, label, href }: SidebarItemProps) => {
   const pathname = usePathname();
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(false);
-  const [isPending, startTransition] = useTransition();
-
-  const IsActive = pathname === href ||
-    pathname?.startsWith(`${href}/`);
-
-  const onClick = () => {
-    NProgress.start();
-    setIsLoading(true);
-
-    startTransition(() => {
-      router.push(href);
-    });
-  };
-
-  useEffect(() => {
-    if (!isPending) {
-      NProgress.done();
-      setIsLoading(false);
-    }
-  }, [isPending]);
+  const isActive = pathname === href || pathname?.startsWith(`${href}/`);
 
   return (
-    <button
-      onClick={onClick}
-      type="button"
+    <Link
+      href={href}
       className={cn(
-        "mx-3 flex items-center gap-x-2 rounded-xl px-4 text-left text-sm font-medium text-slate-400 transition-all hover:bg-white/10 hover:text-white",
-        IsActive &&
-          "bg-neutral-500/20 text-white hover:bg-neutral-500/20 hover:text-white"
+        "mx-3 flex items-center gap-x-3 rounded-xl px-4 py-3.5 text-left text-sm font-medium text-slate-500 transition-all hover:bg-slate-100/80 hover:text-slate-900",
+        isActive && "bg-teal-50 font-semibold text-teal-900 hover:bg-teal-50 hover:text-teal-900"
       )}
     >
-      <div className="flex items-center gap-x-2 py-4">
-        <Icon
-          size={22}
-          className={cn("text-slate-400", IsActive && "text-neutral-300")}
-        />
-        {label}
-      </div>
-    </button>
+      <Icon size={20} className={cn("shrink-0 text-slate-400", isActive && "text-teal-600")} />
+      <span className="truncate">{label}</span>
+      {isActive && <span aria-hidden className="ml-auto h-1.5 w-1.5 shrink-0 rounded-full bg-teal-500" />}
+    </Link>
   );
 };

@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { Categories } from "./_components/categories";
 import { SearchInput } from "@/components/search-input";
 import { getCourses } from "@/actions/get-courses";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { CoursesList } from "@/components/courses-list";
 import Link from "next/link";
 
@@ -40,7 +40,7 @@ const SearchPage = async ({
       <SearchInput />
     </div>
     <div className="page-shell min-h-full p-5 md:p-8">
-      <div className="mx-auto max-w-7xl space-y-6">
+      <div className="w-full space-y-6">
       <div><p className="eyebrow">Explore</p><h1 className="mt-1 text-3xl font-black tracking-tight">Find your next skill</h1><p className="mt-2 text-slate-500">Browse courses that meet you where your curiosity starts.</p></div>
       <Categories items={categories} />
       {await TeacherSearchResults({ query: searchParams.title ?? undefined, userId: userId ?? undefined })}

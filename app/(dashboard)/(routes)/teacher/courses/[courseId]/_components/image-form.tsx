@@ -5,9 +5,8 @@ import axios from "axios";
 
 import { useRouter } from "next/navigation";
 
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ImageIcon, Pencil, PlusCircle } from "lucide-react";
+import { ImageIcon, Loader2, SquarePen, UploadCloud } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -22,7 +21,7 @@ interface ImageFormProps {
 
 const formSchema = z.object({
   imageUrl: z.string().min(1, {
-    message: "Image is Required",
+    message: "Image is required",
   }),
 });
 
@@ -43,43 +42,57 @@ export const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
       toast.error("Something went wrong");
     }
   };
+
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
-      <div className="font-medium flex items-center justify-between">
-        Course Image
-        <Button onClick={toggleEdit} variant="ghost">
-          {isEditing && <>Cancel</>}
-          {!isEditing && !initialData.imageUrl && (
+    <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-teal-300/60">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500">
+            <ImageIcon className="h-4 w-4" />
+          </span>
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">
+            Cover image
+          </p>
+        </div>
+        <Button
+          type="button"
+          onClick={toggleEdit}
+          variant="outline"
+          size="sm"
+          className="shrink-0 gap-1.5 rounded-lg border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-teal-300 hover:text-teal-700"
+        >
+          {isEditing ? (
+            "Cancel"
+          ) : (
             <>
-              <PlusCircle className="h-4 w-4 mr-2" />
-              Add an Image
-            </>
-          )}
-          {!isEditing && initialData.imageUrl && (
-            <>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit Image
+              <SquarePen className="h-3.5 w-3.5" />
+              {initialData.imageUrl ? "Change" : "Add"}
             </>
           )}
         </Button>
       </div>
+
       {!isEditing &&
         (!initialData.imageUrl ? (
-          <div className="flex items-center justify-center h-60 bg-slate-200 rounded-md">
-            <ImageIcon className="h-10 w-10 text-slate-500" />
+          <div className="mt-3 flex aspect-video flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-slate-50/70 text-slate-400">
+            <UploadCloud className="h-8 w-8" />
+            <p className="text-xs font-medium text-slate-500">
+              No cover image yet
+            </p>
           </div>
         ) : (
-          <div className="relative aspect-video mt-2">
+          <div className="relative mt-3 aspect-video overflow-hidden rounded-xl border border-slate-200">
             <Image
-              alt="Upload"
+              alt="Course cover"
               fill
-              className="object-cover rounded-md"
+              className="object-cover"
               src={initialData.imageUrl}
             />
           </div>
         ))}
+
       {isEditing && (
-        <div>
+        <div className="mt-4">
           <FileUpload
             endpoint="courseImage"
             onChange={(url) => {
@@ -88,9 +101,9 @@ export const ImageForm = ({ initialData, courseId }: ImageFormProps) => {
               }
             }}
           />
-          <div className="text-xs text-muted-foreground mt-4">
-            16:9 aspect ratio recommended
-          </div>
+          <p className="mt-3 text-xs text-slate-500">
+            16:9 aspect ratio recommended · minimum 1280px wide.
+          </p>
         </div>
       )}
     </div>

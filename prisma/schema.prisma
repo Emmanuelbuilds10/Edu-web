@@ -265,6 +265,18 @@ model TeacherFollow {
   @@index([followerId])
 }
 
+// Local demo accounts used when Clerk keys are not configured.
+// Real deployments authenticate through Clerk and never touch this model.
+model DemoUser {
+  id           String   @id @default(uuid()) @map("_id")
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("STUDENT")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 model UserProfile {
   id        String   @id @default(uuid()) @map("_id")
   userId    String   @unique

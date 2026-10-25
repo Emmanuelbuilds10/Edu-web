@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
-import { ClerkProvider } from "@clerk/nextjs";
 import { ToastProvider } from "@/components/providers/toaster-provider";
 import { ConfettiProvider } from "@/components/providers/confetti-provider";
+import { AppAuthProvider } from "@/components/providers/app-auth-provider";
+import { UploadModeProvider } from "@/components/providers/upload-mode-provider";
+import { RouteProgress } from "@/components/providers/route-progress";
+import { auth } from "@/lib/auth";
 export const metadata: Metadata = {
   title: "Sabiplex | Learn without limits",
   description: "A modern learning platform for ambitious people.",
@@ -14,15 +18,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { userId } = auth();
+
   return (
-    <ClerkProvider>
-    <html lang="en">
-      <body className="min-h-screen">
-        <ToastProvider />
-        <ConfettiProvider />
-        {children}
-      </body>
-    </html>
-    </ClerkProvider>
+    <AppAuthProvider userId={userId ?? null}>
+      <UploadModeProvider mode={process.env.UPLOADTHING_SECRET ? "uploadthing" : "local"}>
+        <html lang="en">
+          <body className="min-h-screen">
+            <noscript>
+              <style>{".reveal{opacity:1;transform:none}"}</style>
+            </noscript>
+            <Suspense fallback={null}>
+              <RouteProgress />
+            </Suspense>
+            <ToastProvider />
+            <ConfettiProvider />
+            {children}
+          </body>
+        </html>
+      </UploadModeProvider>
+    </AppAuthProvider>
   );
 }

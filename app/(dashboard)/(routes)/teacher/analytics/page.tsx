@@ -1,5 +1,6 @@
 import { getAnalytics } from "@/actions/get-analytics";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
+import { hasTeacherAccess } from "@/lib/teacher";
 import { redirect } from "next/navigation";
 import { DataCard } from "./_components/data-card";
 import Chart from "./_components/chart";
@@ -8,14 +9,22 @@ const AnalyticsPage = async () => {
   const { userId } = auth();
 
   if (!userId) {
-    return redirect("/");
+    return redirect(`/sign-in?redirect_url=${encodeURIComponent("/teacher/analytics")}`);
+  }
+
+  if (!(await hasTeacherAccess(userId))) {
+    return redirect("/teacher-mode");
   }
   const { data, totalRevenue, totalSales, unrecordedSales } = await getAnalytics(userId);
   return (
-    <div className="page-shell min-h-full p-5 md:p-8">
-      <div className="mx-auto max-w-7xl">
-        <p className="eyebrow">Teacher studio</p><h1 className="mt-1 text-3xl font-black tracking-tight">Earnings</h1><p className="mt-2 text-slate-500">Confirmed Paystack course payments and sales.</p>
-      <div className="mt-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm md:p-6">
+    <div className="dashboard-canvas min-h-full p-5 md:p-8">
+      <div className="w-full space-y-6">
+        <div>
+          <p className="eyebrow text-teal-700">Teacher studio</p>
+          <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-900 md:text-4xl">Earnings</h1>
+          <p className="mt-1.5 text-sm text-slate-500">Confirmed Paystack course payments and sales.</p>
+        </div>
+      <div className="surface-card p-4 md:p-6">
         <div className="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
           <DataCard value={totalSales} label="Total Enrollments" />
           <DataCard value={totalRevenue} label="Recorded gross revenue" shouldFormat />

@@ -70,10 +70,34 @@ const config = withUt( {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "float-slow": {
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1)" },
+          "50%": { transform: "translate3d(0, -26px, 0) scale(1.05)" },
+        },
+        "float-slower": {
+          "0%, 100%": { transform: "translate3d(0, 0, 0) scale(1.02)" },
+          "50%": { transform: "translate3d(-22px, 18px, 0) scale(1.08)" },
+        },
+        "gradient-pan": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "soft-pulse": {
+          "0%, 100%": { opacity: "0.4" },
+          "50%": { opacity: "1" },
+        },
+        "shimmer": {
+          "100%": { transform: "translateX(100%)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "float-slow": "float-slow 16s ease-in-out infinite",
+        "float-slower": "float-slower 22s ease-in-out infinite",
+        "gradient-pan": "gradient-pan 9s ease infinite",
+        "soft-pulse": "soft-pulse 2.6s ease-in-out infinite",
+        "shimmer": "shimmer 1.6s infinite",
       },
     },
   },

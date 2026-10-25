@@ -2,7 +2,6 @@
 
 import * as React from "react"
 
-
 import {
   ColumnDef,
   ColumnFiltersState,
@@ -24,10 +23,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input"
-import Link from "next/link";
-import { PlusCircle } from "lucide-react";
-
+import { Input } from "@/components/ui/input";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -38,11 +34,8 @@ export function DataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
-    const [sorting, setSorting] = React.useState<SortingState>([])
-
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-      []
-    )
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
 
   const table = useReactTable({
     data,
@@ -61,30 +54,27 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-       <div className="flex flex-col gap-3 pb-5 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-3 pb-5 sm:flex-row sm:items-center sm:justify-between">
         <Input
           placeholder="Filter courses..."
           value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={(event) =>
             table.getColumn("title")?.setFilterValue(event.target.value)
           }
-          className="max-w-sm bg-slate-50"
+          className="h-10 max-w-sm rounded-xl border-slate-200 bg-slate-50/80 focus-visible:border-teal-300 focus-visible:ring-teal-500/20"
         />
-        <Link href="/teacher/create">
-          <Button>
-            <PlusCircle className="h-4 w-4 mr-2" />
-            New Course
-          </Button>
-        </Link>
+        <p className="text-xs font-medium text-slate-500">
+          {data.length} {data.length === 1 ? "course" : "courses"} in your studio
+        </p>
       </div>
-      <div className="overflow-hidden rounded-xl border border-slate-200">
+      <div className="overflow-hidden rounded-xl border border-slate-100">
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-slate-50/80">
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow key={headerGroup.id} className="hover:bg-transparent">
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead key={header.id} className="h-11 text-xs font-semibold uppercase tracking-wide text-slate-500">
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -92,7 +82,7 @@ export function DataTable<TData, TValue>({
                             header.getContext()
                           )}
                     </TableHead>
-                  );
+                  )
                 })}
               </TableRow>
             ))}
@@ -103,6 +93,7 @@ export function DataTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className="hover:bg-slate-50/60"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
@@ -118,32 +109,39 @@ export function DataTable<TData, TValue>({
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-24 text-center text-sm text-slate-500"
                 >
-                  No results.
+                  No courses match that filter.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+      <div className="flex items-center justify-between gap-3 py-4">
+        <p className="text-xs text-slate-500">
+          Page {table.getState().pagination.pageIndex + 1} of {Math.max(1, table.getPageCount())}
+        </p>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg"
+            onClick={() => table.previousPage()}
+            disabled={!table.getCanPreviousPage()}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="rounded-lg"
+            onClick={() => table.nextPage()}
+            disabled={!table.getCanNextPage()}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );

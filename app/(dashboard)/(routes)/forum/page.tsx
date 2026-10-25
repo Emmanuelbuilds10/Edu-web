@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { getCommunityIdentities } from "@/lib/community-profile";
@@ -44,5 +44,5 @@ export default async function ForumPage() {
     likedByMe: likes.length > 0,
   }));
 
-  return <main className="page-shell min-h-full px-5 py-8 md:px-8 md:py-12"><div className="mx-auto max-w-3xl"><p className="eyebrow">Sabiplex community</p><h1 className="mt-1 text-3xl font-black tracking-tight">Forum</h1><p className="mt-2 text-slate-600">Share ideas, ask questions, and learn together. You’re posting as <strong>{profile.displayName || profile.username} · @{profile.username}</strong>.</p><div className="mt-7"><ForumFeed initialPosts={initialPosts} username={profile.username} displayName={profile.displayName || profile.username} avatarUrl={profile.avatarUrl || null} userId={userId} /></div></div></main>;
+  return <main className="page-shell min-h-full px-5 py-8 md:px-8 md:py-12"><div className="w-full"><p className="eyebrow">Sabiplex community</p><h1 className="mt-1 text-3xl font-black tracking-tight">Forum</h1><p className="mt-2 text-slate-600">Share ideas, ask questions, and learn together. You’re posting as <strong>{profile.displayName || profile.username} · @{profile.username}</strong>.</p><div className="mt-7"><ForumFeed initialPosts={initialPosts} username={profile.username} displayName={profile.displayName || profile.username} avatarUrl={profile.avatarUrl || null} userId={userId} /></div></div></main>;
 }

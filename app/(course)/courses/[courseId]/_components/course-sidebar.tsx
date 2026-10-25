@@ -1,5 +1,5 @@
 import { db } from "@/lib/db"
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth"
 import { Chapter, Course, UserProgress } from "@prisma/client"
 import { CourseSidebarItem } from "./course-sidebar-item"
 import { CourseProgress } from "./course-progress"
@@ -28,6 +28,7 @@ export const CourseSidebar = async ({
             }
         }
     }) : null
+    const isOwner = course.userId === userId
     return (
         <div className="h-full border-r flex flex-col overflow-y-auto shadow-sm">
             <div className="p-8 flex flex-col border-b">
@@ -49,7 +50,7 @@ export const CourseSidebar = async ({
                         label={chapter.title}
                         isCompleted={!!chapter.userProgress?.[0]?.isCompleted}
                         courseId={course.id}
-                        isLocked={!chapter.isFree && !purchase}
+                        isLocked={!chapter.isFree && !purchase && !isOwner}
                     />
                 ))}
             </div>

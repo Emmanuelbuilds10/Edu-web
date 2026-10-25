@@ -66,19 +66,19 @@ export function TeacherModePanel({ isTeacher, isAdmin, applicationStatus }: { is
 
   return (
     <div className="space-y-6">
-      <section className="flex flex-col gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+      <section className="surface-card flex flex-col gap-5 p-6 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-start gap-4">
-          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-neutral-50 text-neutral-700"><GraduationCap className="h-6 w-6" /></span>
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-teal-50 text-teal-600 ring-1 ring-inset ring-teal-100"><GraduationCap className="h-6 w-6" /></span>
           <div>
             <h2 className="text-lg font-bold text-slate-900">{isTeacher ? "Teacher access is active" : "Teach what you know"}</h2>
             <p className="mt-1 max-w-xl text-sm leading-6 text-slate-600">{isTeacher ? "Create courses, manage lessons, and view your teaching analytics." : "Apply to publish courses and help learners build new skills."}</p>
           </div>
         </div>
-        {isTeacher && <Button asChild className="shrink-0 gap-2"><Link href="/teacher/courses"><BookOpen className="h-4 w-4" />Open teacher workspace<ArrowRight className="h-4 w-4" /></Link></Button>}
+        {isTeacher && <Button asChild className="shrink-0 gap-2 bg-teal-600 text-white hover:bg-teal-700"><Link href="/teacher/courses"><BookOpen className="h-4 w-4" />Open teacher workspace<ArrowRight className="h-4 w-4" /></Link></Button>}
       </section>
 
       {!isTeacher && (
-        <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <section className="surface-card p-6 sm:p-8">
           {applicationStatus === "PENDING" ? (
             <div className="rounded-xl bg-amber-50 p-5 text-sm leading-6 text-amber-900">Your application is awaiting review. You can keep learning while it is pending.</div>
           ) : (
@@ -93,7 +93,7 @@ export function TeacherModePanel({ isTeacher, isAdmin, applicationStatus }: { is
       )}
 
       {isAdmin && (
-        <section className="space-y-5 rounded-2xl border border-neutral-100 bg-white p-6 shadow-sm sm:p-8">
+        <section className="surface-card space-y-5 p-6 sm:p-8">
           <div><p className="eyebrow">Teacher administration</p><h2 className="mt-1 text-xl font-bold text-slate-900">Manage teacher access</h2><p className="mt-1 text-sm text-slate-500">You can add an existing account by email or review applications.</p></div>
           <form onSubmit={addTeacher} className="flex flex-col gap-2 sm:flex-row">
             <Input type="email" value={teacherEmail} onChange={(event) => setTeacherEmail(event.target.value)} placeholder="Existing user’s email address" required />
@@ -102,11 +102,11 @@ export function TeacherModePanel({ isTeacher, isAdmin, applicationStatus }: { is
           <div className="border-t border-slate-100 pt-5">
             <h3 className="font-semibold text-slate-900">Pending applications <span className="ml-1 text-sm font-normal text-slate-500">{applications.length}</span></h3>
             {applications.length ? <div className="mt-3 space-y-3">{applications.map((application) => (
-              <article key={application.id} className="rounded-xl border border-slate-200 p-4">
+              <article key={application.id} className="rounded-xl border border-slate-100 bg-slate-50/60 p-4">
                 <div className="flex flex-col justify-between gap-3 sm:flex-row">
                   <div><p className="font-semibold text-slate-900">{application.fullName}</p><p className="text-xs text-slate-500">{application.email}</p></div>
                   <div className="flex gap-2">
-                    <Button size="sm" disabled={busy} onClick={() => decide(application.id, "APPROVED")} className="gap-1"><Check className="h-4 w-4" />Approve</Button>
+                    <Button size="sm" disabled={busy} onClick={() => decide(application.id, "APPROVED")} className="gap-1 bg-teal-600 text-white hover:bg-teal-700"><Check className="h-4 w-4" />Approve</Button>
                     <Button size="sm" variant="outline" disabled={busy} onClick={() => decide(application.id, "REJECTED")} className="gap-1"><X className="h-4 w-4" />Decline</Button>
                   </div>
                 </div>

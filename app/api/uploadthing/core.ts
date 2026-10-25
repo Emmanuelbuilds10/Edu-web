@@ -1,5 +1,5 @@
 import { hasTeacherAccess } from "@/lib/teacher";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
  
 const f = createUploadthing();

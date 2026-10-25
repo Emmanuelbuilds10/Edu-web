@@ -1,4 +1,4 @@
-import { currentUser } from "@clerk/nextjs/server";
+import { currentUser } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { Award, GraduationCap } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
@@ -57,7 +57,7 @@ export default async function CertificatePage({
     "Student";
 
   return (
-    <main className="mx-auto max-w-5xl p-5 md:p-8">
+    <main className="dashboard-canvas min-h-full p-5 md:p-8">
       <div className="mb-5 flex items-center justify-between print:hidden">
         <div>
           <p className="eyebrow">Course completion</p>

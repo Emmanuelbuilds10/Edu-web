@@ -5,9 +5,6 @@ import Link from "next/link";
 import { IconBadge } from "@/components/icon-badge";
 import { Award, BookOpen, Star } from "lucide-react";
 import { formatPrice } from "@/lib/format";
-import { useState, useTransition, useEffect } from "react";
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
 import { CourseProgress } from "@/components/course-progress";
 
 interface CourseCardProps {
@@ -33,31 +30,11 @@ export const CourseCard = ({
   ratingAverage,
   reviewCount = 0,
 }: CourseCardProps) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isPending, startTransition] = useTransition();
-
-  const onClick = () => {
-    NProgress.start();
-    setIsLoading(true);
-
-    startTransition(() => {
-      // Navigate to the course detail page
-    });
-  };
-
-  useEffect(() => {
-    if (!isPending) {
-      NProgress.done();
-      setIsLoading(false);
-    }
-  }, [isPending]);
-
   return (
     <div className="h-full">
       <Link href={`/courses/${id}`} passHref>
       <div
         className="group overflow-hidden rounded-2xl border border-slate-200 bg-white p-3 shadow-sm transition duration-300 hover:-translate-y-1 hover:border-neutral-200 hover:shadow-xl hover:shadow-neutral-100/60"
-        onClick={onClick} // Trigger loader on click
       >
         <div className="relative w-full aspect-video rounded-md overflow-hidden">
           <Image

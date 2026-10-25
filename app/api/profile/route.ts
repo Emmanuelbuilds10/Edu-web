@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
@@ -10,15 +10,26 @@ export async function GET() {
   return NextResponse.json(profile);
 }
 
+const isAllowedAvatarUrl = (value: string) => {
+  if (value.startsWith("/uploads/")) return true; // local upload fallback
+  if (value.startsWith("data:image/")) return true; // generated demo avatar
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+
 const profileSchema = z.object({
   displayName: z.string().trim().min(1).max(60),
   avatarUrl: z.string().trim().max(1000).optional().default(""),
 }).superRefine((values, context) => {
-  if (!values.avatarUrl) return;
-  try {
-    if (new URL(values.avatarUrl).protocol !== "https:") throw new Error("https required");
-  } catch {
-    context.addIssue({ code: z.ZodIssueCode.custom, path: ["avatarUrl"], message: "Choose a valid uploaded avatar." });
+  if (values.avatarUrl && !isAllowedAvatarUrl(values.avatarUrl)) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["avatarUrl"],
+      message: "Upload a profile photo or use an https image link.",
+    });
   }
 });
 

@@ -4,7 +4,7 @@ import * as z from "zod";
 import axios from "axios";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import {useRouter} from "next/navigation"
+import { useRouter } from "next/navigation";
 
 import {
   Form,
@@ -16,7 +16,7 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Check, Loader2, SquarePen, Type } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 
@@ -28,9 +28,11 @@ interface TitleFormProps {
 }
 
 const formSchema = z.object({
-  title: z.string().min(1, {
-    message: "Title is Required",
-  }),
+  title: z
+    .string()
+    .trim()
+    .min(1, { message: "Title is required" })
+    .max(120, { message: "Keep the title to 120 characters or fewer." }),
 });
 
 export const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
@@ -38,7 +40,7 @@ export const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
 
   const toggleEdit = () => setIsEditing((current) => !current);
 
-  const router = useRouter()
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,30 +51,54 @@ export const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-        await axios.patch(`/api/courses/${courseId}`, values)
-        toast.success("Course Updated")
-        toggleEdit()
-        router.refresh()
+      await axios.patch(`/api/courses/${courseId}`, values);
+      toast.success("Course Updated");
+      toggleEdit();
+      router.refresh();
     } catch (error) {
-        toast.error("Something went wrong")
+      toast.error("Something went wrong");
     }
   };
+
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
-      <div className="font-medium flex items-center justify-between">
-        Course Title
-        <Button onClick={toggleEdit} variant="ghost">
+    <div className="mt-6 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-teal-300/60">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500">
+            <Type className="h-4 w-4" />
+          </span>
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">
+            Course title
+          </p>
+        </div>
+        <Button
+          type="button"
+          onClick={toggleEdit}
+          variant="outline"
+          size="sm"
+          className="shrink-0 gap-1.5 rounded-lg border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-teal-300 hover:text-teal-700"
+        >
           {isEditing ? (
-            <>Cancel</>
+            "Cancel"
           ) : (
             <>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit Title
+              <SquarePen className="h-3.5 w-3.5" />
+              Edit
             </>
           )}
         </Button>
       </div>
-      {!isEditing && <p className="text-sm mt-2">{initialData.title}</p>}
+
+      {!isEditing && (
+        <p className="mt-3 break-words text-sm font-medium leading-6 text-slate-800">
+          {initialData.title || (
+            <span className="font-normal italic text-slate-400">
+              No title yet
+            </span>
+          )}
+        </p>
+      )}
+
       {isEditing && (
         <Form {...form}>
           <form
@@ -86,8 +112,11 @@ export const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
                 <FormItem>
                   <FormControl>
                     <Input
+                      autoFocus
+                      maxLength={120}
                       disabled={isSubmitting}
-                      placeholder="e.g. 'Writing Code is keen' "
+                      placeholder="e.g. Introduction to Algorithms"
+                      className="h-11 rounded-xl border-slate-200 bg-white text-base focus-visible:border-teal-300 focus-visible:ring-teal-500/20"
                       {...field}
                     />
                   </FormControl>
@@ -95,8 +124,17 @@ export const TitleForm = ({ initialData, courseId }: TitleFormProps) => {
                 </FormItem>
               )}
             />
-            <div className="items-center flex gap-x-2">
-              <Button disabled={!isValid || isSubmitting} type="submit">
+            <div className="flex items-center justify-end gap-2">
+              <Button
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                className="gap-2 rounded-xl bg-teal-600 text-white shadow-none hover:bg-teal-700"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
                 Save
               </Button>
             </div>

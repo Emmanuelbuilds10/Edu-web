@@ -14,16 +14,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pencil } from "lucide-react";
+import { Check, Loader2, Shapes, SquarePen } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
-import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
 import { Course } from "@prisma/client";
-import { ComboBox } from '@/components/ui/combobox';
-
+import { ComboBox } from "@/components/ui/combobox";
 
 interface CategoryFormProps {
   initialData: Course;
@@ -32,7 +28,7 @@ interface CategoryFormProps {
 }
 
 const formSchema = z.object({
-  categoryId: z.string().min(1),
+  categoryId: z.string().min(1, { message: "Choose a category" }),
 });
 
 export const CategoryForm = ({
@@ -69,31 +65,50 @@ export const CategoryForm = ({
   const selectedOption = options.find(
     (option) => option.value === initialData.categoryId
   );
+
   return (
-    <div className="mt-6 border bg-slate-100 rounded-md p-4">
-      <div className="font-medium flex items-center justify-between">
-        Course category
-        <Button onClick={toggleEdit} variant="ghost">
+    <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.04)] transition hover:border-teal-300/60">
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-slate-100 text-slate-500">
+            <Shapes className="h-4 w-4" />
+          </span>
+          <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-slate-500">
+            Category
+          </p>
+        </div>
+        <Button
+          type="button"
+          onClick={toggleEdit}
+          variant="outline"
+          size="sm"
+          className="shrink-0 gap-1.5 rounded-lg border-slate-200 bg-white text-xs font-semibold text-slate-600 hover:border-teal-300 hover:text-teal-700"
+        >
           {isEditing ? (
-            <>Cancel</>
+            "Cancel"
           ) : (
             <>
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit category
+              <SquarePen className="h-3.5 w-3.5" />
+              Edit
             </>
           )}
         </Button>
       </div>
+
       {!isEditing && (
-        <p
-          className={cn(
-            "text-sm mt-2",
-            !initialData.categoryId && "text-slate-500 italic"
+        <div className="mt-3">
+          {selectedOption ? (
+            <span className="inline-flex items-center rounded-full border border-teal-200 bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700">
+              {selectedOption.label}
+            </span>
+          ) : (
+            <span className="inline-flex items-center rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-700">
+              No category yet
+            </span>
           )}
-        >
-          {selectedOption?.label || "No category"}
-        </p>
+        </div>
       )}
+
       {isEditing && (
         <Form {...form}>
           <form
@@ -108,12 +123,25 @@ export const CategoryForm = ({
                   <FormControl>
                     <ComboBox options={options} {...field} />
                   </FormControl>
+                  <p className="text-xs text-slate-500">
+                    Learners filter courses by category, so pick the closest
+                    match.
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <div className="items-center flex gap-x-2">
-              <Button disabled={!isValid || isSubmitting} type="submit">
+            <div className="flex items-center justify-end gap-2">
+              <Button
+                type="submit"
+                disabled={!isValid || isSubmitting}
+                className="gap-2 rounded-xl bg-teal-600 text-white shadow-none hover:bg-teal-700"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Check className="h-4 w-4" />
+                )}
                 Save
               </Button>
             </div>

@@ -1,11 +1,12 @@
 import { db } from "@/lib/db";
-import { auth, clerkClient } from "@clerk/nextjs/server";
+import { auth, clerkClient } from "@/lib/auth";
 import axios from "axios";
 import { ArrowLeft, BookOpen, CheckCircle2, GraduationCap, LockKeyhole, PlayCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { CourseEnrollButton } from "./chapters/[chapterId]/_components/course-enroll-button";
+import { CourseFreeEnrollButton } from "./chapters/[chapterId]/_components/course-free-enroll-button";
 import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/format";
 import { CourseReviews, type CourseReviewItem } from "./_components/course-reviews";
@@ -92,8 +93,10 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
         // Keep a useful fallback if the instructor's Clerk account is unavailable.
     }
 
-    const canWatchAll = !!purchase;
+    const isOwner = course.userId === userId;
+    const canWatchAll = !!purchase || isOwner;
     const hasPrice = typeof course.price === "number" && course.price > 0;
+    const isFree = course.price === 0;
 
     return (
         <div className="min-h-full bg-slate-50 px-5 py-8 md:px-8 md:py-12">
@@ -126,6 +129,7 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
                                     <Link href={`/teachers/${course.userId}`} className="inline-flex items-center gap-2 hover:text-slate-950"><GraduationCap className="h-4 w-4 text-neutral-600" /> {instructorName}<span className="text-xs underline underline-offset-4">View profile</span></Link>
                                     <span className="inline-flex items-center gap-2"><BookOpen className="h-4 w-4 text-neutral-600" /> {course.chapters.length} {course.chapters.length === 1 ? "chapter" : "chapters"}</span>
                                     {purchase && <span className="inline-flex items-center gap-2 font-semibold text-emerald-700"><CheckCircle2 className="h-4 w-4" /> Enrolled</span>}
+                                    {!purchase && isOwner && <span className="inline-flex items-center gap-2 font-semibold text-neutral-700"><PlayCircle className="h-4 w-4" /> Instructor preview</span>}
                                 </div>
                                 <div className="mt-7">
                                     <h2 className="text-xl font-bold text-slate-900">About this course</h2>
@@ -183,21 +187,32 @@ export default async function CoursePage({ params, searchParams }: CoursePagePro
 
                     <aside className="rounded-3xl border border-slate-200 bg-white p-6 shadow-lg shadow-slate-200/60 lg:sticky lg:top-8">
                         <p className="text-sm font-semibold text-slate-500">Course access</p>
-                        <p className="mt-2 text-4xl font-black tracking-tight text-slate-900">{hasPrice ? formatPrice(course.price!) : "Price coming soon"}</p>
+                        <p className="mt-2 text-4xl font-black tracking-tight text-slate-900">{hasPrice ? formatPrice(course.price!) : isFree ? "Free" : "Price coming soon"}</p>
                         <div className="mt-6">
                             {purchase && course.chapters[0] ? (
                                 <Button asChild className="w-full"><Link href={`/courses/${course.id}/chapters/${course.chapters[0].id}`}>Continue course</Link></Button>
                             ) : purchase ? (
                                 <Button disabled className="w-full">Course coming soon</Button>
-                            ) : userId && hasPrice ? (
-                                <CourseEnrollButton courseId={course.id} price={course.price!} />
+                            ) : isOwner && course.chapters[0] ? (
+                                <Button asChild className="w-full"><Link href={`/courses/${course.id}/chapters/${course.chapters[0].id}`}>Preview your course</Link></Button>
+                            ) : isOwner ? (
+                                <Button asChild className="w-full" variant="outline"><Link href={`/teacher/courses/${course.id}`}>Add your first lesson</Link></Button>
                             ) : !userId ? (
                                 <Button asChild className="w-full"><Link href={`/sign-in?redirect_url=${encodeURIComponent(`/courses/${course.id}`)}`}>Sign in to enroll</Link></Button>
+                            ) : isFree ? (
+                                <CourseFreeEnrollButton courseId={course.id} />
+                            ) : hasPrice ? (
+                                <CourseEnrollButton courseId={course.id} price={course.price!} />
                             ) : (
                                 <Button disabled className="w-full">Enrollment unavailable</Button>
                             )}
                         </div>
-                        <p className="mt-4 text-center text-xs leading-5 text-slate-500">{course.chapters.filter((chapter) => chapter.isFree).length} free preview lessons | Learn at your own pace</p>
+                        <p className="mt-4 text-center text-xs leading-5 text-slate-500">
+                            {course.chapters.filter((chapter) => chapter.isFree).length} free preview lessons | Learn at your own pace
+                        </p>
+                        {isFree && !purchase && (
+                            <p className="mt-2 text-center text-xs font-semibold text-emerald-700">This course is free. Enrol to unlock every lesson.</p>
+                        )}
                     </aside>
                 </div>
             </div>

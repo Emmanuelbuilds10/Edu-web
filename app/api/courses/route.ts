@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { hasTeacherAccess } from "@/lib/teacher";
-import { auth } from "@clerk/nextjs/server";
+import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import { getCourses } from "@/actions/get-courses";
 
@@ -36,21 +36,29 @@ export async function GET(request: Request) {
 
 export async function POST(req: Request) {
   try {
-  const { userId } = auth();
-    const {title} = await req.json()
-
+    const { userId } = auth();
     if (!userId || !(await hasTeacherAccess(userId))) {
-        return new NextResponse("Unauthorized", {status: 401})
+      return NextResponse.json({ error: "Teacher access is required to create a course." }, { status: 401 });
     }
+
+    const body = await req.json().catch(() => null);
+    const title = typeof body?.title === "string" ? body.title.trim() : "";
+    if (!title) {
+      return NextResponse.json({ error: "Give your course a title to continue." }, { status: 400 });
+    }
+    if (title.length > 120) {
+      return NextResponse.json({ error: "Keep the title to 120 characters or fewer." }, { status: 400 });
+    }
+
     const course = await db.course.create({
-        data: {
-            userId,
-            title,
-        }
-    })
-    return NextResponse.json(course)
+      data: {
+        userId,
+        title,
+      },
+    });
+    return NextResponse.json(course);
   } catch (error) {
     console.log("[COURSES]", error);
-    return new NextResponse("Internal Error", { status: 500 });
+    return NextResponse.json({ error: "Could not create the course. Please try again." }, { status: 500 });
   }
 }

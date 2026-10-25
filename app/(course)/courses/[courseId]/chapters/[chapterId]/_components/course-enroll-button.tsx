@@ -22,6 +22,9 @@ export const CourseEnrollButton = ({
             setIsLoading(true)
             const response = await axios.post(`/api/courses/${courseId}/checkout`)
 
+            if (response.data?.demo) {
+                toast.success("Test payment complete — you are enrolled")
+            }
             window.location.assign(response.data.url)
         } catch (error) {
             const message = axios.isAxiosError(error) && typeof error.response?.data === "string"
