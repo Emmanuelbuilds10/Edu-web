@@ -1,5 +1,5 @@
 import { db } from "@/lib/db"
-import { auth } from "@clerk/nextjs/server"
+import { auth } from "@/lib/auth"
 import { NextResponse } from "next/server"
 
 export async function DELETE (
@@ -24,10 +24,20 @@ export async function DELETE (
             return new NextResponse("UnAuthorized", {status: 401})
         }
 
-        const attachment = await db.attachment.delete({
+        const attachment = await db.attachment.findFirst({
             where: {
                 courseId: params.courseId,
                 id: params.attachmentId,
+            }
+        })
+
+        if (!attachment) {
+            return new NextResponse("Not Found", {status: 404})
+        }
+
+        await db.attachment.delete({
+            where: {
+                id: attachment.id,
             }
         })
 
